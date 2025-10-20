@@ -72,7 +72,7 @@ def medir_color():
 
 def clasificar_material(r, g, b):
     if g == 0 or b == 0:
-        return "Desconocido"
+        return "Otros"
 
     ratio_rg = r / g
     ratio_rb = r / b
@@ -84,7 +84,7 @@ def clasificar_material(r, g, b):
     ):
         return "Plastico"
 
-    return "Desconocido"
+    return "Otros"
 
 def abrir_tapa(segundos=5):
     pwm_servo.ChangeDutyCycle(7.5)
