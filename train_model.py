@@ -76,15 +76,15 @@ X_train, X_test, y_train, y_test = train_test_split(
 # Modelos a entrenar
 # ---------------------------
 models = {
-    "LogisticRegression": LogisticRegression(max_iter=1000, class_weight="balanced", random_state=RANDOM_STATE),
-    "KNN": KNeighborsClassifier(n_neighbors=5),
-    "SVM_rbf": SVC(probability=True, kernel="rbf", class_weight="balanced", random_state=RANDOM_STATE),
-    "DecisionTree": DecisionTreeClassifier(class_weight="balanced", random_state=RANDOM_STATE),
-    "RandomForest": RandomForestClassifier(n_estimators=200, class_weight="balanced", random_state=RANDOM_STATE),
-    "ExtraTrees": ExtraTreesClassifier(n_estimators=200, class_weight="balanced", random_state=RANDOM_STATE),
-    "GradientBoosting": GradientBoostingClassifier(n_estimators=200, random_state=RANDOM_STATE),
-    "AdaBoost": AdaBoostClassifier(n_estimators=200, random_state=RANDOM_STATE),
-    "MLP": MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=500, random_state=RANDOM_STATE),
+    # "LogisticRegression": LogisticRegression(max_iter=1000, class_weight="balanced", random_state=RANDOM_STATE),
+    # "KNN": KNeighborsClassifier(n_neighbors=5),
+    # "SVM_rbf": SVC(probability=True, kernel="rbf", class_weight="balanced", random_state=RANDOM_STATE),
+    # "DecisionTree": DecisionTreeClassifier(class_weight="balanced", random_state=RANDOM_STATE),
+    # "RandomForest": RandomForestClassifier(n_estimators=200, class_weight="balanced", random_state=RANDOM_STATE),
+    # "ExtraTrees": ExtraTreesClassifier(n_estimators=200, class_weight="balanced", random_state=RANDOM_STATE),
+    # "GradientBoosting": GradientBoostingClassifier(n_estimators=200, random_state=RANDOM_STATE),
+    # "AdaBoost": AdaBoostClassifier(n_estimators=200, random_state=RANDOM_STATE),
+    "MLP": MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=5000, random_state=RANDOM_STATE),
 }
 
 # ---------------------------

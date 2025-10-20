@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# cleanbot.py - C�digo revisado para Raspberry Pi 3 B+ con TCS3200 y Servo SG90
+# cleanbot.py - Codigo para Raspberry Pi 3 B+ o superior con TCS3200 y Servo SG90
 
 from flask import Flask, jsonify
 import RPi.GPIO as GPIO
@@ -8,6 +8,8 @@ import sqlite3
 from datetime import datetime
 import sys
 import threading
+import joblib
+import numpy as np
 
 # ---------------------------
 # Configuracion GPIO
@@ -50,7 +52,6 @@ def medir_frecuencia(pulsos=20, timeout=1.0):
     duration = time.time() - start
     return (count / duration) if duration > 0 else 0.0
 
-
 def medir_color():
     GPIO.output(S2, GPIO.LOW)
     GPIO.output(S3, GPIO.LOW)
@@ -69,24 +70,63 @@ def medir_color():
 
     return rojo, verde, azul
 
+try:
+    model = joblib.load("best_model.pkl")
+    # scaler = joblib.load("scaler_trained.pkl")
+    print("? Modelo y escalador cargados correctamente.\n")
+except Exception as e:
+    print("? Error al cargar el modelo y/o el escalador:", e)
+    exit(1)
+
+# ---------------------------
+# Funcion de clasificacion
+# ---------------------------
+import pandas as pd
 
 def clasificar_material(r, g, b):
-    if g == 0 or b == 0:
-        return "Otros"
+    intensidad = r + g + b
+    if intensidad == 0:
+        return "Desconocido"
 
-    ratio_rg = r / g
-    ratio_rb = r / b
+    r_norm = r / intensidad
+    g_norm = g / intensidad
+    b_norm = b / intensidad
+    rg_ratio = r / g if g != 0 else 0
+    rb_ratio = r / b if b != 0 else 0
+    bg_ratio = b / g if g != 0 else 0
 
-    if (
-        (17000 <= r <= 26000 and 9000 <= g <= 15500 and 10000 <= b <= 17200)
-        and (1.3 <= ratio_rg <= 1.7)
-        and (1.2 <= ratio_rb <= 1.6)
-    ):
-        return "Plastico"
+    # Crear DataFrame con nombres de columnas esperados
+    features = pd.DataFrame([[
+        r, g, b, intensidad,
+        r_norm, g_norm, b_norm,
+        rg_ratio, rb_ratio, bg_ratio
+    ]], columns=[
+        "R", "G", "B", "Intensidad",
+        "R_norm", "G_norm", "B_norm",
+        "RG_ratio", "RB_ratio", "BG_ratio"
+    ])
 
-    return "Otros"
+    pred = model.predict(features)[0]
 
-def abrir_tapa(segundos=5):
+    return "Plastico" if pred == 1 else "Otros"
+
+# def clasificar_material(r, g, b):
+#     if g == 0 or b == 0:
+#         return "Otros"
+
+#     ratio_rg = r / g
+#     ratio_rb = r / b
+
+#     if (
+#         (17000 <= r <= 26000 and 9000 <= g <= 15500 and 10000 <= b <= 17200)
+#         and (1.3 <= ratio_rg <= 1.7)
+#         and (1.2 <= ratio_rb <= 1.6)
+#     ):
+#         return "Plastico"
+
+#     return "Otros"
+
+def abrir_tapa(segundos=3):
     pwm_servo.ChangeDutyCycle(7.5)
     time.sleep(segundos)
     cerrar_tapa()
